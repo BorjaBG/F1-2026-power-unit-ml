@@ -6,7 +6,7 @@
 
 ## 1. Perfil del Desarrollador y Contexto Académico
 
-* **Autor / Usuario:** Borja (`borjabg`)
+* **Autor / Usuario:** Borja (`BorjaBG`)
 * **Formación previa:** Curso de Especialización en Inteligencia Artificial y Big Data.
 * **Formación actual:** Bootcamp de Data Science.
 * **Propósito del proyecto:** Proyecto Individual de Machine Learning (correspondiente al hito **3.8: Proyecto Individual - ML**, aunque el alumno cursará **todo el Módulo 3 completo** antes de su entrega final).
@@ -26,7 +26,7 @@ Cualquier solución propuesta debe apoyarse en las herramientas y algoritmos de 
 
 ## 2. Objetivo y Visión del Proyecto
 
-* **Repositorio GitHub:** `borjabg/F1-2026-power-unit-ml`
+* **Repositorio GitHub:** `BorjaBG/F1-2026-power-unit-ml`
 * **Tema:** Análisis, ingeniería inversa y optimización de **Mapas Motor (gestión energética de la Unidad de Potencia)** en la Fórmula 1 bajo el reglamento técnico de **2026**.
 * **Problema de negocio / ingeniería:** En la F1 de 2026, un mapa motor ya no regula solo el motor de combustión (ICE), sino la estrategia óptima de despliegue y regeneración eléctrica entre el ICE y el MGU-K a lo largo de una vuelta. Dado que la batería tiene una capacidad limitada y existen curvas estrictas de recorte de potencia (*derating*) por velocidad, los equipos utilizan Machine Learning para simular el comportamiento del coche y encontrar la política óptima de despliegue energético.
 
@@ -37,9 +37,10 @@ Cualquier solución propuesta debe apoyarse en las herramientas y algoritmos de 
 Toda ingeniería de características (*Feature Engineering*) y entorno de simulación debe respetar las especificaciones de las Unidades de Potencia de 2026:
 
 * **Eliminación del MGU-H:** Toda la recuperación energética proviene de la frenada o del *super-clipping* en recta a través del MGU-K.
-* **Reparto de Potencia (~50/50):**
+* **Reparto de Potencia (aproximadamente equilibrado, no 50/50 exacto):**
   * Motor de Combustión Interna (ICE): $\approx 400\text{ kW}$ ($\sim 536\text{ CV}$).
   * Motor Eléctrico (MGU-K): hasta $350\text{ kW}$ ($\sim 469\text{ CV}$).
+  * Nota: el reparto real es $\sim$53/47; la cifra "~50/50" es una licencia narrativa, no un dato de cálculo.
 * **Límites Energéticos de Batería (ES):**
   * Capacidad máxima útil de almacenamiento: $4\text{ MJ}$ por ciclo.
   * Energía máxima recuperable por vuelta: hasta $9\text{ MJ}$ (en circuitos con suficientes zonas de frenada), lo que obliga a múltiples ciclos de carga y descarga dentro de una misma vuelta.
@@ -75,9 +76,34 @@ El proyecto integra distintas técnicas del Módulo 3 en un flujo modular y prog
 
 ## 5. Estado Actual y Reglas de Colaboración para las IAs
 
-* **Estado actual del repositorio (`borjabg/F1-2026-power-unit-ml`):** Recién inicializado con `README.md` y `.gitignore` estándar de Python. Aún no se ha escrito código fuente ni descargado datos.
+* **Última actualización:** 15 nov 2026 — Revisión de formato: usuario corregido a `BorjaBG`, precisión en el reparto de potencia (~53/47), añadidas sección de entregables pendientes y glosario.
+* **Estado actual del repositorio (`BorjaBG/F1-2026-power-unit-ml`):** Recién inicializado con `README.md` y `.gitignore` estándar de Python. Aún no se ha escrito código fuente ni descargado datos.
 * **Reglas de interacción:**
   1. **Paso a paso:** No generar decenas de archivos de golpe si el usuario no lo pide; avanzar de forma incremental y validada.
   2. **Buenas prácticas de Data Science:** Evitar siempre el *data leakage* (usar `Pipeline` y `GroupKFold` cuando haya datos secuenciales/telemetría por vuelta).
   3. **Explicabilidad:** Traducir siempre las métricas técnicas ($RMSE$, $R^2$, $F1$, Silhouette Score) a implicaciones reales de ingeniería de Fórmula 1.
-  4. **Actualización del documento:** Cada vez que se tome una decisión arquitectónica importante, se elija un circuito banco de pruebas o se complete una fase, actualizar la sección 5 de este archivo.
+  4. **Actualización del documento:** Cada vez que se tome una decisión arquitectónica importante, se elija un circuito banco de pruebas o se complete una fase, actualizar la sección 5 de este archivo (incluida la línea "Última actualización").
+
+---
+
+## 6. Entregables y Evaluación — PENDIENTE DE ENUNCIADO
+
+> **⚠️ Aún no se ha publicado el enunciado/instrucciones oficiales del hito 3.8.** Esta sección se completará cuando lleguen. Hasta entonces, las IAs **no deben asumir** requisitos de formato, estructura de repositorio, pesos de evaluación ni fechas de entrega. Los entregables mencionados en la Fase 3 (lookup table y mapas del circuito) son objetivos técnicos del proyecto, no requisitos oficiales confirmados.
+
+* Pendiente: requisitos del repositorio (estructura, README, memoria).
+* Pendiente: criterios de evaluación y pesos.
+* Pendiente: fecha de entrega y formatos de presentación.
+
+---
+
+## 7. Glosario
+
+* **ICE:** *Internal Combustion Engine*, motor de combustión interna (~400 kW en 2026).
+* **MGU-K:** *Motor Generator Unit - Kinetic*, motor eléctrico acoplado al eje que despliega y recupera energía (hasta 350 kW en 2026).
+* **MGU-H:** *Motor Generator Unit - Heat*, recuperador de energía del turbo. **Eliminado en el reglamento 2026.**
+* **ES:** *Energy Store*, batería. Capacidad útil máxima de $4\text{ MJ}$ por ciclo en 2026.
+* **SoC:** *State of Charge*, estado de carga de la batería (energía disponible en un instante dado).
+* **Mapa Motor:** estrategia de gestión energética: cuánta energía eléctrica desplegar/recuperar en cada punto de la vuelta.
+* **Derating:** recorte reglamentario de la potencia eléctrica máxima en función de la velocidad (curva de la sección 3).
+* **Super-clipping:** recuperación de energía en recta levantando parcialmente el acelerador, con el MGU-K actuando como generador.
+* **Override:** modo de adelantamiento de 2026 (sustituye al DRS): potencia eléctrica completa mantenida hasta ~337 km/h para el coche que persigue a menos de 1 segundo.
