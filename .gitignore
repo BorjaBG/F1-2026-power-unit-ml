@@ -218,3 +218,23 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# FastF1 data cache and local datasets
+data/
+data/fastf1_cache/
+*.pkl
+*.parquet
+*.feather
+
+# Environment and sensitive credentials
+.env
+.env.*
+!.env.example
+.f1token
+.f1auth.json
+
+# VS Code and OS files
+.vscode/
+.DS_Store
+Thumbs.db
+
