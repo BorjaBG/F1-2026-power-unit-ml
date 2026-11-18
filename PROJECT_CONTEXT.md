@@ -81,12 +81,15 @@ El proyecto integra distintas técnicas del Módulo 3 en un flujo modular y prog
 
 ## 5. Estado Actual y Reglas de Colaboración para las IAs
 
-- **Última actualización:** 18 nov 2026 — Entorno `fastf1` v3.9.2 + F1TV Access operativo vía `.env`, `.gitignore` actualizado y Fase 1 iniciada en `notebook.ipynb` con telemetría real de Monza 2026 (Ronda 13, Carrera).
+- **Última actualización:** 18 nov 2026 — Dataset de micro-sectores de Monza 2026 (`Q` + `R`, 113 949 tramos limpios) construido, saneado y guardado en Parquet (`data/processed/monza_2026_microsectors.parquet`).
 - **Estado actual del repositorio (`BorjaBG/F1-2026-power-unit-ml`):**
   - **Infraestructura y seguridad:** Kernel Anaconda `base` (Python 3.13.9) con `fastf1` 3.9.2, `matplotlib` 3.10.0 y `python-dotenv`. Credenciales de F1TV Access configuradas en `.env` (ignorado en Git) y documentadas en `.env.example`. `.gitignore` actualizado para excluir `data/`, `.env`, tokens y `.vscode/`.
   - **Circuito banco de pruebas inicial:** **Monza 2026 (Italian Grand Prix, Ronda 13)**.
-  - **Fase 1 (en curso en `notebook.ipynb`):** Descargada y cacheada la sesión de Carrera (`R`) de Monza 2026. Verificadas las columnas reales de telemetría (incluyendo `X`, `Y`, `Z`, `DriverAhead` y `DistanceToDriverAhead` para modelar _Override_ y geometría). Implementado el primer _Feature Engineering_ sobre la vuelta rápida de referencia (`ANT`, Mercedes, 624 muestras): `dt`, aceleración longitudinal (`a_x`), límite teórico MGU-K (`mguk_limit_kw`) y flags preliminares de _derating_ y _super-clipping_.
-  - **Próximo paso inmediato:** Suavizar/limpiar el ruido de `a_x`, visualizar la vuelta completa para validar físicamente los flags y ampliar la muestra a múltiples vueltas/pilotos (y sesión `'Q'`) antes de segmentar en micro-sectores y aplicar PCA + Clustering.
+  - **Fase 1 (en curso en `notebook.ipynb`):**
+    - Descargadas y cacheadas las sesiones de **Carrera (`R`)** (889 vueltas limpias de 1054, 21 pilotos) y **Clasificación (`Q`)** (97 vueltas lanzadas limpias de 307 con `pick_quicklaps()`), sumando **986 vueltas limpias**.
+    - Validación física inicial sobre la vuelta rápida de `ANT` (624 muestras): suavizado `a_x_smooth`, curva MGU-K FIA 2026 (`mguk_limit_kw`) y detección de _derating_ (> 290 km/h) y _super-clipping_.
+    - Segmentación en micro-sectores de **50 m** (`extract_session_microsectors`), añadiendo proxy de _Override_ (`DistanceToDriverAhead` $\le 1\text{ s}$) y limpieza tras EDA (descartados 329 tramos de borde con `micro_sector < 0` o `sector_time_s < 0.1`, `throttle_mean` acotado a `[0, 100]` y `ax_mean` / `ax_min` acotados a `[-55, 25]` m/s²).
+    - **Dataset limpio resultante:** **113 949 micro-sectores** guardados en `data/processed/monza_2026_microsectors.parquet`.
 - **Reglas de interacción:**
   1. **Paso a paso y sin editar sin permiso:** Avanzar de forma incremental y validada; **no escribir ni editar archivos de código directamente salvo que el usuario lo pida explícitamente**.
   1. **Buenas prácticas de Data Science:** Evitar siempre el _data leakage_ (usar `Pipeline` y `GroupKFold` cuando haya datos secuenciales/telemetría por vuelta).
