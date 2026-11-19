@@ -81,15 +81,21 @@ El proyecto integra distintas técnicas del Módulo 3 en un flujo modular y prog
 
 ## 5. Estado Actual y Reglas de Colaboración para las IAs
 
-- **Última actualización:** 18 nov 2026 — Dataset de micro-sectores de Monza 2026 (`Q` + `R`, 113 949 tramos limpios) construido, saneado y guardado en Parquet (`data/processed/monza_2026_microsectors.parquet`).
+- **Última actualización:** 19 nov 2026 — EDA completo y depuración post-EDA en `notebook.ipynb`; dataset `df_model` (`113 488` tramos, `22` columnas) validado y listo para `StandardScaler` + `PCA`.
 - **Estado actual del repositorio (`BorjaBG/F1-2026-power-unit-ml`):**
   - **Infraestructura y seguridad:** Kernel Anaconda `base` (Python 3.13.9) con `fastf1` 3.9.2, `matplotlib` 3.10.0 y `python-dotenv`. Credenciales de F1TV Access configuradas en `.env` (ignorado en Git) y documentadas en `.env.example`. `.gitignore` actualizado para excluir `data/`, `.env`, tokens y `.vscode/`.
   - **Circuito banco de pruebas inicial:** **Monza 2026 (Italian Grand Prix, Ronda 13)**.
   - **Fase 1 (en curso en `notebook.ipynb`):**
     - Descargadas y cacheadas las sesiones de **Carrera (`R`)** (889 vueltas limpias de 1054, 21 pilotos) y **Clasificación (`Q`)** (97 vueltas lanzadas limpias de 307 con `pick_quicklaps()`), sumando **986 vueltas limpias**.
     - Validación física inicial sobre la vuelta rápida de `ANT` (624 muestras): suavizado `a_x_smooth`, curva MGU-K FIA 2026 (`mguk_limit_kw`) y detección de _derating_ (> 290 km/h) y _super-clipping_.
-    - Segmentación en micro-sectores de **50 m** (`extract_session_microsectors`), añadiendo proxy de _Override_ (`DistanceToDriverAhead` $\le 1\text{ s}$) y limpieza tras EDA (descartados 329 tramos de borde con `micro_sector < 0` o `sector_time_s < 0.1`, `throttle_mean` acotado a `[0, 100]` y `ax_mean` / `ax_min` acotados a `[-55, 25]` m/s²).
-    - **Dataset limpio resultante:** **113 949 micro-sectores** guardados en `data/processed/monza_2026_microsectors.parquet`.
+    - Segmentación en micro-sectores de **50 m** (`extract_session_microsectors`), añadiendo proxy de _Override_ (`DistanceToDriverAhead` $\le 1\text{ s}$) y limpieza inicial (`df_clean`: **113 949 tramos** en `data/processed/monza_2026_microsectors.parquet`, descartando 329 bordes y acotando `throttle_mean` a `[0, 100]` y `ax_mean`/`ax_min` a `[-55, 25]` m/s²).
+    - **EDA y depuración post-EDA (`df_model`):**
+      - Integridad verificada: 0 duplicados y tres compuestos limpios (`HARD`: 53 033, `MEDIUM`: 42 078, `SOFT`: 18 838).
+      - Análisis `Q` vs `R`: en `R` la velocidad mediana es ligeramente inferior por carga de combustible/gestión, pero la velocidad punta máxima es mayor (~351 km/h vs ~344 km/h en `Q`) por efecto del rebufo y *Override*. Se filtraron 4 vueltas atípicas en `R` (`LapTime_s > 91 s`, 461 tramos) por tráfico extremo o incidentes menores.
+      - Refinamiento físico de *super-clipping*: el flag inicial (`a_x <= 0.2`) mezclaba equilibrio aerodinámico en velocidad punta con recarga activa, saliendo más alto en `Q` que en `R`. Se creó `real_clipping` (`throttle_mean >= 99`, `speed_mean > 290`, `ax_mean < -0.5` $\rightarrow$ `5 383` tramos: `8.44 %` en `Q` vs `4.34 %` en `R`), reflejando que en `Q` se llega a frenada con pie a fondo (*clipping* al límite) mientras en `R` predomina el *Lift and Coast* (soltar gas antes de frenar).
+      - Matriz de correlación: detectada alta colinealidad entre `speed_mean`/`speed_max`/`gear_mean` ($0.95\text{--}0.99$) y `ax_mean`/`ax_min` ($0.96$), así como relación inversa `mguk_limit_mean` vs `derating_pct` ($-0.80$). En cambio, `override_pct` es casi ortogonal al resto ($r \approx 0.00$), aportando señal independiente.
+    - **Dataset validado para modelado (`df_model`):** **113 488 tramos** (`22` columnas); `LapTime_s` medio `83.09 s` en `Q` y `86.70 s` en `R`.
+    - **Siguiente paso acordado (pedagógico, paso a paso):** Aplicar primero `StandardScaler` (para evitar que `rpm_mean` domine por escala) + `PCA` sobre las 10 variables no redundantes (excluyendo `speed_max` y `ax_min`) y analizar la varianza explicada y los *loadings* físicos antes de abordar `KMeans`.
 - **Reglas de interacción:**
   1. **Paso a paso y sin editar sin permiso:** Avanzar de forma incremental y validada; **no escribir ni editar archivos de código directamente salvo que el usuario lo pida explícitamente**.
   1. **Buenas prácticas de Data Science:** Evitar siempre el _data leakage_ (usar `Pipeline` y `GroupKFold` cuando haya datos secuenciales/telemetría por vuelta).
